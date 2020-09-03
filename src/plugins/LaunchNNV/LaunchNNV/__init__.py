@@ -6,6 +6,7 @@ import sys
 import logging
 from webgme_bindings import PluginBase
 from . import NNVKeys
+from pathlib import Path
 
 # Setup a logger
 logger = logging.getLogger('LaunchNNV')
@@ -46,8 +47,9 @@ class LaunchNNV(PluginBase):
             # TEMPLATE PARAMETERS:  GET PROJECT NAME AND OWNER
             #
             project_info = self.project.get_project_info()
-            project_name = project_info.get(NNVKeys.project_name_key)
-            project_owner = project_info.get(NNVKeys.project_owner_key)
+            logger.info(NNVKeys.template_project_name_key)
+            project_name = project_info.get(NNVKeys.template_project_name_key)
+            project_owner = project_info.get(NNVKeys.template_project_name_key)
 
             template_parameter_map[NNVKeys.template_project_name_key] = project_name
             template_parameter_map[NNVKeys.template_owner_name_key] = project_owner
@@ -62,272 +64,275 @@ class LaunchNNV(PluginBase):
                 raise RuntimeError("Model needs to be one of {0}".format(NNVKeys.valid_meta_type_name_set))
 
             #
-            # TEMPLATE PARAMETERS: VERIFICATION NODE PATH AND ID
-            #
-            template_parameter_map[NNVKeys.template_verification_node_path_key] = \
-                str(self.get_model_node_path(self.active_node))
-            template_parameter_map[NNVKeys.template_verification_node_id_key] = \
-                self.core.get_path(self.active_node)
-
-            #
             #  GET CHILD VERIFICATION_MODEL NODE OF VERIFICATION_SETUP NODE
             #
             verification_setup_child_node_map = self.get_child_nodes(self.active_node)
+
             verification_model_node_list = verification_setup_child_node_map.get(
-                LaunchNNV.alcmeta_verification_model_meta_name, []
+                NNVKeys.template_lec_exec_node_meta, []
             )
+
+
             if len(verification_model_node_list) == 0:
                 raise RuntimeError(
-                    "No object found of meta-type \"{0}\" in \"{1}\" meta-type object.".format(
-                        LaunchNNV.alcmeta_verification_model_meta_name,
-                        self.alcmeta_verification_model_meta_name
+                    "No object found of meta-type \"{0}\" in meta-type object.".format(
+                        NNVKeys.template_lec_exec_node_meta
+
                     )
                 )
 
             if len(verification_model_node_list) > 1:
                 LaunchNNV.logger.warning(
-                    "More than one object of meta-type \"{0}\" found in \"{1}\" meta-type object.  "
+                    "More than one object of meta-type \"{0}\" found in  meta-type object.  "
                     "Using the first one.".format(
-                        LaunchNNV.alcmeta_verification_model_meta_name,
-                        self.alcmeta_verification_model_meta_name
+                        NNVKeys.template_lec_exec_node_meta
                     )
                 )
 
             verification_model_node = verification_model_node_list[0]
 
-            #
-            # GET CHILD PARAMETER NODES OF VERIFICATION_MODEL NODE
-            #
-            verification_model_child_node_map = self.get_child_nodes(verification_model_node)
 
-            parameter_node_list = verification_model_child_node_map.get(
-                LaunchVerification.alcmeta_parameter_meta_name, []
+            verification_neuralnetwork_node_list = verification_setup_child_node_map.get(
+                NNVKeys.template_NN_exec_node_meta, []
             )
-            if len(parameter_node_list) == 0:
+
+            if len(verification_neuralnetwork_node_list) == 0:
                 raise RuntimeError(
-                    "\"{0}\" meta-type object must have child \"{1}\" meta-type object.".format(
-                        LaunchVerification.alcmeta_parameter_meta_name,
-                        LaunchVerification.alcmeta_verification_model_meta_name
+                    "No object found of meta-type \"{0}\" in meta-type object.".format(
+                        NNVKeys.template_NN_exec_node_meta
+
                     )
-                )
+                 )
+            verification_neuralnetwork_node = verification_neuralnetwork_node_list[0]
+            # # GET NODE OF LEC POINTED TO BY LED MODEL NODE
+            # #
+            lec_node_path = self.core.get_pointer_path(verification_model_node,NNVKeys.template_lec_exec_node_pointer)
+            lec_node = self.core.load_by_path(self.root_node,lec_node_path)
+            neuralnetwork_node_path = self.core.get_pointer_path(verification_neuralnetwork_node, NNVKeys.template_NN_exec_node_pointer)
+            neuralnetwork_node = self.core.load_by_path(self.root_node, neuralnetwork_node_path)
 
-            # READ PARAMETERS INTO DICT
-            parameter_map = {}
-            for parameter_node in parameter_node_list:
-                parameter_name = self.core.get_attribute(parameter_node, "name")
-                parameter_value = self.core.get_attribute(parameter_node, "value")
-                parameter_map[parameter_name.lower()] = \
-                    parameter_value.lower() if isinstance(parameter_value, str) else parameter_value
+            logger.info("lec_path {0} and neural_network_path {1}".format(lec_node_path,neuralnetwork_node_path))
+            neuralnetwork_type = self.core.get_fully_qualified_name(self.core.get_meta_type(neuralnetwork_node))
+            logger.info("Neural Network Type {0}".format(self.core.get_fully_qualified_name(neuralnetwork_type)))
 
-            # MAKE SURE ATTACK-PARAMETER SPECIFIED
-            if RobustnessKeys.attack_parameter_key not in parameter_map:
-                raise RuntimeError("\"{0}\" object must have \"{1}\" parameter.".format(
-                    LaunchVerification.alcmeta_verification_model_meta_name,
-                    RobustnessKeys.attack_parameter_key
-                ))
-
-            attack_type = parameter_map.get(RobustnessKeys.attack_parameter_key)
-            if attack_type not in RobustnessKeys.attack_map.keys():
-                raise RuntimeError("Invalid attack type \"{0}\":  must be one of \"{1}\".".format(
-                    attack_type, RobustnessKeys.attack_map.keys()
-                ))
+            if neuralnetwork_type
 
             #
-            # GET NAMES OF ALL REQUIRED PARAMETERS
+            # #
+            # # TEMPLATE PARAMETERS:  LEC NODE PATH AND ID
+            # #
+            # template_parameter_map[RobustnessKeys.template_lec_node_id_key] = lec_path
+            # template_parameter_map[RobustnessKeys.template_lec_node_path_key] = str(self.get_model_node_path(lec_node))
+
+            # # MAKE SURE ATTACK-PARAMETER SPECIFIED
+            # if RobustnessKeys.attack_parameter_key not in parameter_map:
+            #     raise RuntimeError("\"{0}\" object must have \"{1}\" parameter.".format(
+            #         LaunchVerification.alcmeta_verification_model_meta_name,
+            #         RobustnessKeys.attack_parameter_key
+            #     ))
             #
-            extra_parameter_set = RobustnessKeys.attack_map \
-                .get(attack_type) \
-                .get(RobustnessKeys.required_parameters_key)
-
-            required_parameter_name_set = LaunchVerification.parameter_name_set.union(
-                extra_parameter_set
-            )
-
+            # attack_type = parameter_map.get(RobustnessKeys.attack_parameter_key)
+            # if attack_type not in RobustnessKeys.attack_map.keys():
+            #     raise RuntimeError("Invalid attack type \"{0}\":  must be one of \"{1}\".".format(
+            #         attack_type, RobustnessKeys.attack_map.keys()
+            #     ))
             #
-            # DELETE UNNECESSARY PARAMETERS
+            # #
+            # # GET NAMES OF ALL REQUIRED PARAMETERS
+            # #
+            # extra_parameter_set = RobustnessKeys.attack_map \
+            #     .get(attack_type) \
+            #     .get(RobustnessKeys.required_parameters_key)
             #
-            parameter_map_key_set = set(parameter_map.keys())
-            unnecessary_parameter_name_set = parameter_map_key_set.difference(required_parameter_name_set)
-            for key in unnecessary_parameter_name_set:
-                del parameter_map[key]
-
+            # required_parameter_name_set = LaunchVerification.parameter_name_set.union(
+            #     extra_parameter_set
+            # )
             #
-            # MAKE SURE ALL REQUIRED PARAMETERS ARE PRESENT
+            # #
+            # # DELETE UNNECESSARY PARAMETERS
+            # #
+            # parameter_map_key_set = set(parameter_map.keys())
+            # unnecessary_parameter_name_set = parameter_map_key_set.difference(required_parameter_name_set)
+            # for key in unnecessary_parameter_name_set:
+            #     del parameter_map[key]
             #
-            parameter_map_key_set = set(parameter_map.keys())
-            missing_parameter_set = required_parameter_name_set.difference(parameter_map_key_set)
-
-            if len(missing_parameter_set) != 0:
-                raise RuntimeError("Missing parameters \"{0}\"for attack type \"{1}\".".format(
-                    missing_parameter_set, attack_type
-                ))
-
+            # #
+            # # MAKE SURE ALL REQUIRED PARAMETERS ARE PRESENT
+            # #
+            # parameter_map_key_set = set(parameter_map.keys())
+            # missing_parameter_set = required_parameter_name_set.difference(parameter_map_key_set)
             #
-            # GET PERCEPTION LEC MODEL DIRECTORY
+            # if len(missing_parameter_set) != 0:
+            #     raise RuntimeError("Missing parameters \"{0}\"for attack type \"{1}\".".format(
+            #         missing_parameter_set, attack_type
+            #     ))
             #
-
-            # GET LEC MODEL NODE
-            lec_model_node_list = verification_model_child_node_map.get(LaunchVerification.alcmeta_lec_model_meta_name)
-            if len(lec_model_node_list) == 0:
-                raise RuntimeError("At least one \"{0}\" object must be in \"{1}\" model".format(
-                    LaunchVerification.alcmeta_lec_model_meta_name,
-                    LaunchVerification.alcmeta_verification_model_meta_name
-                ))
-            if len(lec_model_node_list) > 1:
-                LaunchVerification.logger.warning(
-                    "More than one \"{0}\" object found in \"{1}\" model.  Using the first".format(
-                        LaunchVerification.alcmeta_lec_model_meta_name,
-                        LaunchVerification.alcmeta_verification_model_meta_name
-                    )
-                )
-
-            lec_model_node = lec_model_node_list[0]
-
+            # #
+            # # GET PERCEPTION LEC MODEL DIRECTORY
+            # #
             #
-            # TEMPLATE PARAMETERS:  LEC MODEL NODE PATH AND ID
+            # # GET LEC MODEL NODE
+            # lec_model_node_list = verification_model_child_node_map.get(LaunchVerification.alcmeta_lec_model_meta_name)
+            # if len(lec_model_node_list) == 0:
+            #     raise RuntimeError("At least one \"{0}\" object must be in \"{1}\" model".format(
+            #         LaunchVerification.alcmeta_lec_model_meta_name,
+            #         LaunchVerification.alcmeta_verification_model_meta_name
+            #     ))
+            # if len(lec_model_node_list) > 1:
+            #     LaunchVerification.logger.warning(
+            #         "More than one \"{0}\" object found in \"{1}\" model.  Using the first".format(
+            #             LaunchVerification.alcmeta_lec_model_meta_name,
+            #             LaunchVerification.alcmeta_verification_model_meta_name
+            #         )
+            #     )
             #
-            template_parameter_map[RobustnessKeys.template_lec_node_reference_path_key] = \
-                str(self.get_model_node_path(lec_model_node))
-            template_parameter_map[RobustnessKeys.template_lec_node_reference_id_key] = \
-                self.core.get_path(lec_model_node)
-
+            # lec_model_node = lec_model_node_list[0]
             #
-            # GET NODE OF LEC POINTED TO BY LED MODEL NODE
+            # #
+            # # TEMPLATE PARAMETERS:  LEC MODEL NODE PATH AND ID
+            # #
+            # template_parameter_map[RobustnessKeys.template_lec_node_reference_path_key] = \
+            #     str(self.get_model_node_path(lec_model_node))
+            # template_parameter_map[RobustnessKeys.template_lec_node_reference_id_key] = \
+            #     self.core.get_path(lec_model_node)
             #
-            lec_path = self.core.get_pointer_path(lec_model_node, LaunchVerification.alcmeta_lec_model_pointer_name)
-            lec_node = self.core.load_by_path(self.root_node, lec_path)
-
+            # #
+            # # GET NODE OF LEC POINTED TO BY LED MODEL NODE
+            # #
+            # lec_path = self.core.get_pointer_path(lec_model_node, LaunchVerification.alcmeta_lec_model_pointer_name)
+            # lec_node = self.core.load_by_path(self.root_node, lec_path)
             #
-            # TEMPLATE PARAMETERS:  LEC NODE PATH AND ID
+            # #
+            # # TEMPLATE PARAMETERS:  LEC NODE PATH AND ID
+            # #
+            # template_parameter_map[RobustnessKeys.template_lec_node_id_key] = lec_path
+            # template_parameter_map[RobustnessKeys.template_lec_node_path_key] = str(self.get_model_node_path(lec_node))
             #
-            template_parameter_map[RobustnessKeys.template_lec_node_id_key] = lec_path
-            template_parameter_map[RobustnessKeys.template_lec_node_path_key] = str(self.get_model_node_path(lec_node))
-
-            # GET LEC MODEL DIRECTORY
-            lec_info_map_str = self.core.get_attribute(
-                lec_node, LaunchVerification.alcmeta_set_member_attribute_name
-            )
-            lec_info_map = json.loads(lec_info_map_str)
-            lec_directory = lec_info_map.get(LaunchVerification.data_info_map_directory_key)
-            lec_directory_path = Path(lec_directory)
-
-            # GET THE LEC FILE
-            network_directory_path = Path(lec_directory_path, LaunchVerification.network_directory_name)
-            mat_file_list = sorted(network_directory_path.glob("*.mat"))
-
-            if len(mat_file_list) == 0:
-                raise RuntimeError(
-                    "lec directory \"{0}\" must contain at least one mat-file"
-                    " (that contains a neural network).".format(network_directory_path)
-                )
-            mat_file = mat_file_list[0].absolute()
-
+            # # GET LEC MODEL DIRECTORY
+            # lec_info_map_str = self.core.get_attribute(
+            #     lec_node, LaunchVerification.alcmeta_set_member_attribute_name
+            # )
+            # lec_info_map = json.loads(lec_info_map_str)
+            # lec_directory = lec_info_map.get(LaunchVerification.data_info_map_directory_key)
+            # lec_directory_path = Path(lec_directory)
             #
-            # TEMPLATE PARAMETERS:  LEC DIRECTORY PATH, LEC NETWORK DIRECTORY PATH, LEC MAT-FILE NAME
+            # # GET THE LEC FILE
+            # network_directory_path = Path(lec_directory_path, LaunchVerification.network_directory_name)
+            # mat_file_list = sorted(network_directory_path.glob("*.mat"))
             #
-            template_parameter_map[RobustnessKeys.template_lec_parent_directory_path_key] = \
-                str(lec_directory_path)
-            template_parameter_map[RobustnessKeys.template_lec_directory_path_key] = str(network_directory_path)
-            template_parameter_map[RobustnessKeys.template_lec_file_name_key] = str(mat_file.name)
-
-            if len(mat_file_list) > 1:
-                LaunchNNV.logger.warning(
-                    "More than 1 mat-file found in \"{0}\" directory.  Using \"{1}\"".format(
-                        network_directory_path, mat_file.name
-                    )
-                )
-
+            # if len(mat_file_list) == 0:
+            #     raise RuntimeError(
+            #         "lec directory \"{0}\" must contain at least one mat-file"
+            #         " (that contains a neural network).".format(network_directory_path)
+            #     )
+            # mat_file = mat_file_list[0].absolute()
             #
-            # GET TEST-DATA DIRECTORIES
+            # #
+            # # TEMPLATE PARAMETERS:  LEC DIRECTORY PATH, LEC NETWORK DIRECTORY PATH, LEC MAT-FILE NAME
+            # #
+            # template_parameter_map[RobustnessKeys.template_lec_parent_directory_path_key] = \
+            #     str(lec_directory_path)
+            # template_parameter_map[RobustnessKeys.template_lec_directory_path_key] = str(network_directory_path)
+            # template_parameter_map[RobustnessKeys.template_lec_file_name_key] = str(mat_file.name)
             #
-
-            # GET EVAL_DATA NODE
-            if LaunchNNV.alcmeta_eval_data_meta_name not in verification_model_child_node_map:
-                raise RuntimeError("\"{0}\" object must be in \"{1}\" model".format(
-                    LaunchVerification.alcmeta_eval_data_meta_name,
-                    LaunchVerification.alcmeta_verification_model_meta_name
-                ))
-
-            eval_data_node_list = verification_model_child_node_map.get(LaunchVerification.alcmeta_eval_data_meta_name)
-            if len(eval_data_node_list) == 0:
-                raise RuntimeError("At least one \"{0}\" object must be in \"{1}\" model".format(
-                    LaunchNNV.alcmeta_eval_data_meta_name,
-                    LaunchNNV.alcmeta_verification_model_meta_name
-                ))
-            if len(eval_data_node_list) > 1:
-                LaunchNNV.logger.warning(
-                    "More than one \"{0}\" object found in \"{1}\" model.  Using the first".format(
-                        LaunchNNV.alcmeta_eval_data_meta_name,
-                        LaunchNNV.alcmeta_verification_model_meta_name
-                    )
-                )
-
-            eval_data_node = eval_data_node_list[0]
-
+            # if len(mat_file_list) > 1:
+            #     LaunchNNV.logger.warning(
+            #         "More than 1 mat-file found in \"{0}\" directory.  Using \"{1}\"".format(
+            #             network_directory_path, mat_file.name
+            #         )
+            #     )
             #
-            # TEMPLATE PARAMETERS:  EVALDATA NODE PATH AND ID
+            # #
+            # # GET TEST-DATA DIRECTORIES
+            # #
             #
-            template_parameter_map[RobustnessKeys.template_eval_data_node_path_key] = \
-                str(self.get_model_node_path(eval_data_node))
-            template_parameter_map[RobustnessKeys.template_eval_data_node_id_key] = \
-                self.core.get_path(eval_data_node)
-
-            # GET "LaunchVerification.alcmeta_eval_data_set_name" SET MEMBER VALUE
-            # -- LIST OF DATACOLLECTION RESULT NODE PATHS
-            set_member_list = self.core.get_member_paths(eval_data_node, LaunchNNV.alcmeta_eval_data_set_name)
-            if len(set_member_list) == 0:
-                raise RuntimeError("\"{0}\" object must contain \"{1}\" set with at least 1 item.".format(
-                    LaunchNNV.alcmeta_eval_data_meta_name, LaunchVerification.alcmeta_eval_data_set_name
-                ))
-
-            # GET (STRING) PATHS OF DIRECTORIES CONTAINING TEST DATA
-            test_data_directory_list = []
-            for set_member in set_member_list:
-                set_member_node = self.core.load_by_path(self.root_node, set_member)
-                data_info_map_str = self.core.get_attribute(
-                    set_member_node, LaunchVerification.alcmeta_set_member_attribute_name
-                )
-                data_info_map = json.loads(data_info_map_str)
-                test_data_directory_list.append(
-                    data_info_map.get(LaunchVerification.data_info_map_directory_key)
-                )
-
-            if len(test_data_directory_list) == 0:
-                raise RuntimeError(
-                    "\"{0}\" object must contain at least one directory with category-named"
-                    " subdirectories and test images of a given category under the corresponding category-named"
-                    " directory."
-                )
-
+            # # GET EVAL_DATA NODE
+            # if LaunchNNV.alcmeta_eval_data_meta_name not in verification_model_child_node_map:
+            #     raise RuntimeError("\"{0}\" object must be in \"{1}\" model".format(
+            #         LaunchVerification.alcmeta_eval_data_meta_name,
+            #         LaunchVerification.alcmeta_verification_model_meta_name
+            #     ))
             #
-            # TEMPLATE PARAMETERS:  TEST-DATA-DIRECTORY-LIST AND PARAMETER MAP
+            # eval_data_node_list = verification_model_child_node_map.get(LaunchVerification.alcmeta_eval_data_meta_name)
+            # if len(eval_data_node_list) == 0:
+            #     raise RuntimeError("At least one \"{0}\" object must be in \"{1}\" model".format(
+            #         LaunchNNV.alcmeta_eval_data_meta_name,
+            #         LaunchNNV.alcmeta_verification_model_meta_name
+            #     ))
+            # if len(eval_data_node_list) > 1:
+            #     LaunchNNV.logger.warning(
+            #         "More than one \"{0}\" object found in \"{1}\" model.  Using the first".format(
+            #             LaunchNNV.alcmeta_eval_data_meta_name,
+            #             LaunchNNV.alcmeta_verification_model_meta_name
+            #         )
+            #     )
             #
-            template_parameter_map[RobustnessKeys.template_test_data_directory_list_key] = test_data_directory_list
-            template_parameter_map[RobustnessKeys.template_parameter_map_key] = parameter_map
-
+            # eval_data_node = eval_data_node_list[0]
             #
-            # GET DATASET SCRIPT FOR EXTRACTING TRAINING/TESTING DATA IMAGES, CATEGORY NAMES, CATEGORY VALUES
+            # #
+            # # TEMPLATE PARAMETERS:  EVALDATA NODE PATH AND ID
+            # #
+            # template_parameter_map[RobustnessKeys.template_eval_data_node_path_key] = \
+            #     str(self.get_model_node_path(eval_data_node))
+            # template_parameter_map[RobustnessKeys.template_eval_data_node_id_key] = \
+            #     self.core.get_path(eval_data_node)
             #
-            lec_dataset_script_text = self.core.get_attribute(
-                lec_model_node, LaunchVerification.alcmeta_lec_model_dataset_name
-            )
-            template_parameter_map[RobustnessKeys.template_dataset_key] = lec_dataset_script_text
-
-            project_jupyter_notebook_directory_path = Path(
-                lec_directory_path, RobustnessKeys.notebooks_directory_name
-            )
-            seconds_since_epoch = int(time.time())
-            specific_notebook_directory_path = Path(project_jupyter_notebook_directory_path, str(seconds_since_epoch))
-            specific_notebook_directory_path.mkdir(parents=True)
-
-            template_parameter_map[RobustnessKeys.template_specific_notebook_directory_key] = \
-                str(specific_notebook_directory_path)
-
-            template_parameter_file = Path(
-                specific_notebook_directory_path, RobustnessKeys.template_parameter_file_name
-            )
-            with template_parameter_file.open("w") as template_parameter_file_fp:
-                json.dump(template_parameter_map, template_parameter_file_fp, indent=4, sort_keys=True)
+            # # GET "LaunchVerification.alcmeta_eval_data_set_name" SET MEMBER VALUE
+            # # -- LIST OF DATACOLLECTION RESULT NODE PATHS
+            # set_member_list = self.core.get_member_paths(eval_data_node, LaunchNNV.alcmeta_eval_data_set_name)
+            # if len(set_member_list) == 0:
+            #     raise RuntimeError("\"{0}\" object must contain \"{1}\" set with at least 1 item.".format(
+            #         LaunchNNV.alcmeta_eval_data_meta_name, LaunchVerification.alcmeta_eval_data_set_name
+            #     ))
+            #
+            # # GET (STRING) PATHS OF DIRECTORIES CONTAINING TEST DATA
+            # test_data_directory_list = []
+            # for set_member in set_member_list:
+            #     set_member_node = self.core.load_by_path(self.root_node, set_member)
+            #     data_info_map_str = self.core.get_attribute(
+            #         set_member_node, LaunchVerification.alcmeta_set_member_attribute_name
+            #     )
+            #     data_info_map = json.loads(data_info_map_str)
+            #     test_data_directory_list.append(
+            #         data_info_map.get(LaunchVerification.data_info_map_directory_key)
+            #     )
+            #
+            # if len(test_data_directory_list) == 0:
+            #     raise RuntimeError(
+            #         "\"{0}\" object must contain at least one directory with category-named"
+            #         " subdirectories and test images of a given category under the corresponding category-named"
+            #         " directory."
+            #     )
+            #
+            # #
+            # # TEMPLATE PARAMETERS:  TEST-DATA-DIRECTORY-LIST AND PARAMETER MAP
+            # #
+            # template_parameter_map[RobustnessKeys.template_test_data_directory_list_key] = test_data_directory_list
+            # template_parameter_map[RobustnessKeys.template_parameter_map_key] = parameter_map
+            #
+            # #
+            # # GET DATASET SCRIPT FOR EXTRACTING TRAINING/TESTING DATA IMAGES, CATEGORY NAMES, CATEGORY VALUES
+            # #
+            # lec_dataset_script_text = self.core.get_attribute(
+            #     lec_model_node, LaunchVerification.alcmeta_lec_model_dataset_name
+            # )
+            # template_parameter_map[RobustnessKeys.template_dataset_key] = lec_dataset_script_text
+            #
+            # project_jupyter_notebook_directory_path = Path(
+            #     lec_directory_path, RobustnessKeys.notebooks_directory_name
+            # )
+            # seconds_since_epoch = int(time.time())
+            # specific_notebook_directory_path = Path(project_jupyter_notebook_directory_path, str(seconds_since_epoch))
+            # specific_notebook_directory_path.mkdir(parents=True)
+            #
+            # template_parameter_map[RobustnessKeys.template_specific_notebook_directory_key] = \
+            #     str(specific_notebook_directory_path)
+            #
+            # template_parameter_file = Path(
+            #     specific_notebook_directory_path, RobustnessKeys.template_parameter_file_name
+            # )
+            # with template_parameter_file.open("w") as template_parameter_file_fp:
+            #     json.dump(template_parameter_map, template_parameter_file_fp, indent=4, sort_keys=True)
 
             #
             # EXECUTE SLURM HERE
@@ -341,7 +346,7 @@ class LaunchNNV(PluginBase):
             exit()
 
     def check_active_node_meta(self):
-        return self.active_node_meta_type_name in self.valid_meta_type_name_set
+        return self.active_node_meta_type_name in NNVKeys.valid_meta_type_name_set
 
     def get_child_nodes(self, parent_node):
 
@@ -364,7 +369,7 @@ class LaunchNNV(PluginBase):
             return retval
 
         node_name = self.core.get_fully_qualified_name(node)
-        if node_name == LaunchNNV.root_node_name:
+        if node_name == NNVKeys.template_root_node_name:
             return Path('/', retval)
 
         return self.get_model_node_path(

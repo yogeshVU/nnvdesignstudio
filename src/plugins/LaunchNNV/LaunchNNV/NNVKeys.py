@@ -1,7 +1,8 @@
-template_owner_name_key = "owner_name"
-template_project_name_key = "project_name"
+template_owner_name_key = "owner"
+template_project_name_key = "name"
+template_root_node_name = "Root"
 
-
+template_experiment_node_meta = "ExperimentIndex"
 template_lec_node_meta = "LEC"
 template_lec_node_model_blob ="model"
 template_lec_exec_node_meta = "LECExec"
@@ -36,23 +37,28 @@ template_FFNN_verification_key  = "verify"
 template_FFNN_reachability_method_key = "reach-method"
 
 
-template_NNCS_halfspace_matrix_key
-template_NNCS_halfspace_vector_key
-template_NNCS_lb_key
-template_NNCS_ub_key
-template_NNCS_reachability_key
-template_NNCS_cores_key
-template_NNCS_steps
-template_NNCS_lb_refinput_key
-template_NNCS_ub_refinput_key
-template_NNCS_verification_key
-template_NNCS_reach_method_key
-template_NNCS_
-template_NNCS_
-template_NNCS_
-template_NNCS_
-template_NNCS_
-template_NNCS_
+template_NNCS_halfspace_matrix_key = "HalfSpace-matrix"
+template_NNCS_halfspace_vector_key = "HalfSpace-vector"
+template_NNCS_lb_key = "lb"
+template_NNCS_ub_key = "ub"
+template_NNCS_reachability_key = "reach"
+template_NNCS_cores_key = "cores"
+template_NNCS_steps = "steps"
+template_NNCS_lb_refinput_key = "lb-refInput"
+template_NNCS_ub_refinput_key= "ub-refInput"
+template_NNCS_verification_key = "verify"
+template_NNCS_reach_method_key = "reach-method"
+
+template_NNCS_LinearSys_A_key = "A"
+template_NNCS_LinearSys_B_key ="B"
+template_NNCS_LinearSys_C_key ="C"
+template_NNCS_LinearSys_D_key = "D"
+template_NNCS_LinearSys_Ts_key  = "Ts"
+template_NNCS_LinearSys_Cont_reachable_steps_key = "reachable-steps"
+
+template_NNCS_NonLinearSys_filename_key = "file"
+template_NNCS_NonLinearSys_func_key = "function"
+template_NNCS_NonLinearSys_Cont_reachable_steps_key = "reachable-steps"
 
 
 
@@ -108,7 +114,6 @@ template_parameter_file_name = "template_parameters.json"
 notebooks_directory_name = "notebooks"
 
 valid_meta_type_name_set = {
-    "ALCMeta.VerificationSetup",
-    "ALCMeta.ValidationSetup",
-    "ALCMeta.SystemIDSetup"
+    "ExperimentIndex",
+
 }
