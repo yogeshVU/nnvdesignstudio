@@ -1,0 +1,14 @@
+[
+  {
+    "id": "Params",
+    "title": "Param Info",
+    "panel": "panels/Params/ParamsPanel",
+    "DEBUG_ONLY": false
+  },
+  {
+    "id": "MyNewViz",
+    "title": "MyNewViz",
+    "panel": "panels/MyNewViz/MyNewVizPanel",
+    "DEBUG_ONLY": false
+  }
+]

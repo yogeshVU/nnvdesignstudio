@@ -1,0 +1,29 @@
+{
+  "components": {
+    "decorators": {
+      "MyNewDecorator": {
+        "src": "src/decorators/MyNewDecorator"
+      }
+    },
+    "visualizers": {
+      "MyNewViz": {
+        "src": "panels/MyNewViz/MyNewVizPanel",
+        "title": "MyNewViz",
+        "panel": "src/visualizers/panels/MyNewViz",
+        "secondary": false,
+        "widget": "src/visualizers/widgets/MyNewViz"
+      }
+    },
+    "plugins": {
+      "MyPythonPlugin": {
+        "src": "src/plugins/MyPythonPlugin",
+        "test": "test/plugins/MyPythonPlugin"
+      }
+    }
+  },
+  "dependencies": {
+    "decorators": {},
+    "visualizers": {},
+    "plugins": {}
+  }
+}
