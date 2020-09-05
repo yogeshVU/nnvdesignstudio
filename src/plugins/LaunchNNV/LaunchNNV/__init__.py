@@ -113,9 +113,25 @@ class LaunchNNV(PluginBase):
 
             logger.info("lec_path {0} and neural_network_path {1}".format(lec_node_path,neuralnetwork_node_path))
             neuralnetwork_type = self.core.get_fully_qualified_name(self.core.get_meta_type(neuralnetwork_node))
-            logger.info("Neural Network Type {0}".format(self.core.get_fully_qualified_name(neuralnetwork_type)))
+            logger.info("Neural Network Type {0}".format(neuralnetwork_type))
 
-            if neuralnetwork_type
+            template_parameter_map[NNVKeys.template_NN_node_base_meta] = neuralnetwork_type
+
+            if neuralnetwork_type in NNVKeys.template_NN_node_valid_meta:
+                logger.info("Valid Neural Network Controller {0}".format(neuralnetwork_type))
+                if neuralnetwork_type == NNVKeys.template_NN_CNN_key:
+                    for ikey in NNVKeys.template_CNN_required_param:
+                        template_parameter_map[ikey] = self.core.get_attribute(neuralnetwork_node,ikey)
+                        logger.info("values of template{0}{1}".format(ikey,template_parameter_map[ikey]))
+                elif neuralnetwork_type == NNVKeys.template_NN_NNCS_DiscreteNonLinear_key:
+                    for ikey  in NNVKeys.template_NNCS_NonLinearSys_Discrete_param_keys:
+                        template_parameter_map[ikey] = self.core.get_attribute(neuralnetwork_node, ikey)
+                        logger.info("values of template: {0}  :  {1}".format(ikey, template_parameter_map[ikey]))
+            from pprint import pformat
+            logger.info(pformat(template_parameter_map))
+
+
+
 
             #
             # #
