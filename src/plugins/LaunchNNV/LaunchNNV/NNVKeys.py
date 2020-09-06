@@ -19,7 +19,7 @@ template_NN_node_base_meta = "NNType"
 template_NN_CNN_key = "CNN"
 template_NN_FFNN_key = "FFNN"
 template_NN_NNCS_DiscreteLinear_key = "DiscreteLinearNNCS"
-template_NN_NNCS_ContinuousDiscrete_key  = "ContinuousLinearNNCS"
+template_NN_NNCS_ContinuousLinear_key  = "ContinuousLinearNNCS"
 template_NN_NNCS_DiscreteNonLinear_key = "DiscreteNonLinearNNCS"
 template_NN_NNCS_ContinuousNonLinear_key = "ContinuousNonLinearNNCS"
 
@@ -27,7 +27,7 @@ template_NN_node_valid_meta = {
     template_NN_CNN_key ,
     template_NN_FFNN_key,
     template_NN_NNCS_DiscreteLinear_key,
-    template_NN_NNCS_ContinuousDiscrete_key,
+    template_NN_NNCS_ContinuousLinear_key,
     template_NN_NNCS_DiscreteNonLinear_key,
     template_NN_NNCS_ContinuousNonLinear_key
 }
@@ -41,7 +41,7 @@ template_CNN_reachability_method_key = "reach-method"
 template_CNN_std_delta_key = "std"
 template_CNN_threshold_key = "threshold"
 
-template_CNN_required_param = {
+template_CNN_param_keys = {
 template_CNN_attack_key,template_CNN_delta_key,template_CNN_target_key,template_CNN_mean_key,template_CNN_pixels_key,
 template_CNN_reachability_method_key, template_CNN_std_delta_key,template_CNN_threshold_key
 }
@@ -54,6 +54,15 @@ template_FFNN_reachability_key = "reach"
 template_FFNN_verification_key  = "verify"
 template_FFNN_reachability_method_key = "reach-method"
 
+template_FFNN_param_keys = {
+    template_FFNN_halfspace_matrix_key ,
+    template_FFNN_halfspace_vector_key,
+    template_FFNN_lb_key,
+    template_FFNN_ub_key  ,
+    template_FFNN_reachability_key ,
+    template_FFNN_verification_key ,
+    template_FFNN_reachability_method_key
+}
 
 template_NNCS_halfspace_matrix_key = "HalfSpace-matrix"
 template_NNCS_halfspace_vector_key = "HalfSpace-vector"
@@ -75,7 +84,7 @@ template_NNCS_param_keys = {
     template_NNCS_ub_key ,
     template_NNCS_reachability_key,
     template_NNCS_cores_key,
-    template_NNCS_steps ,
+    template_NNCS_steps,
     template_NNCS_lb_refinput_key ,
     template_NNCS_ub_refinput_key,
     template_NNCS_verification_key,
@@ -120,6 +129,13 @@ template_NNCS_NonLinearSys_Discrete_param_keys = template_NNCS_NonLinearSys_para
 template_NNCS_NonLinearSys_Continuous_param_keys = template_NNCS_NonLinearSys_param_keys.union({template_NNCS_NonLinearSys_Cont_reachable_steps_key})
 
 
+template_NN_param= {}
+template_NN_param[template_NN_FFNN_key] = template_FFNN_param_keys
+template_NN_param[template_NN_CNN_key] = template_CNN_param_keys
+template_NN_param[template_NN_NNCS_ContinuousLinear_key] = template_NNCS_LinearSys_Cont_param_keys
+template_NN_param[template_NN_NNCS_ContinuousNonLinear_key] = template_NNCS_NonLinearSys_Continuous_param_keys
+template_NN_param[template_NN_NNCS_DiscreteLinear_key] = template_NNCS_LinearSys_Discrete_param_keys
+template_NN_param[template_NN_NNCS_DiscreteNonLinear_key] = template_NNCS_NonLinearSys_Discrete_param_keys
 
 
 
