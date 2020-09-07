@@ -139,53 +139,9 @@ template_NN_param[template_NN_NNCS_DiscreteNonLinear_key] = template_NNCS_NonLin
 
 
 
-
-template_parameter_map_key = "parameter_map"
-
-template_mean_key = "mean"
-template_results_file_name_key = "results_file_name"
-template_standard_deviation_key = "standard_deviation"
-template_test_data_directory_list_key = "test_data_directory_list"
-template_verification_node_id_key = "verification_node_id"
-template_verification_node_path_key = "verification_node_path"
-
-attack_parameter_key = "attack"
-delta_parameter_key = "delta"
-method_parameter_key = "method"
-noise_parameter_key = "noise"
-pixels_parameter_key = "pixels"
-threshold_parameter_key = "threshold"
-
-brightening_attack_type_name = "brightening"
-darkening_attack_type_name = "darkening"
-random_noise_attack_type_name = "random_noise"
-
-required_parameters_key = "required_parameters"
-perturbation_function_name_key = "perturbation_function_name"
-
-attack_map = {
-    brightening_attack_type_name: {
-        required_parameters_key: {delta_parameter_key, threshold_parameter_key},
-        perturbation_function_name_key: "perturbBrightening"
-    },
-    darkening_attack_type_name: {
-        required_parameters_key: {delta_parameter_key, threshold_parameter_key},
-        perturbation_function_name_key: "perturbDarkening"
-    },
-    random_noise_attack_type_name: {
-        required_parameters_key: {noise_parameter_key, pixels_parameter_key},
-        perturbation_function_name_key: "perturbRandomNoise"
-    }
-}
-
-image_path_key = "image_path"
-category_name_key = "category_name"
-category_number_key = "category_number"
-result_key = "result"
-
 template_parameter_file_name = "template_parameters.json"
-notebooks_directory_name = "notebooks"
-
+output_directory_name = "/home/ubuntu/yogesh/outputs/"
+lec_model_file_name = "input_model.mat"
 valid_meta_type_name_set = {
     "ExperimentIndex",
 
