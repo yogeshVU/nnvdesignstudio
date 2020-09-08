@@ -13,6 +13,8 @@ from . import NNVKeys
 from pathlib import Path
 
 # Setup a logger
+from . import DockerJob
+
 logger = logging.getLogger('LaunchNNV')
 logger.setLevel(logging.INFO)
 handler = logging.StreamHandler(sys.stdout)  # By default it logs to stderr..
@@ -67,9 +69,6 @@ class LaunchNNV(PluginBase):
             if not self.check_active_node_meta():
                 raise RuntimeError("Model needs to be one of {0}".format(NNVKeys.valid_meta_type_name_set))
 
-            #
-            #  GET CHILD VERIFICATION_MODEL NODE OF VERIFICATION_SETUP NODE
-            #
             verification_setup_child_node_map = self.get_child_nodes(self.active_node)
 
             verification_model_node_list = verification_setup_child_node_map.get(
@@ -93,15 +92,68 @@ class LaunchNNV(PluginBase):
                     )
                 )
 
+
+
+
             verification_model_node = verification_model_node_list[0]
-            lec_node_path = self.core.get_pointer_path(verification_model_node,NNVKeys.template_lec_exec_node_pointer)
-            lec_node = self.core.load_by_path(self.root_node,lec_node_path)
+            lec_node_path = self.core.get_pointer_path(verification_model_node, NNVKeys.template_lec_exec_node_pointer)
+            lec_node = self.core.load_by_path(self.root_node, lec_node_path)
             lec_node_type = self.core.get_fully_qualified_name(self.core.get_meta_type(lec_node))
             logger.info("LEC Node Type {0}".format(lec_node_type))
-            logger.info("LEC info: {0} {1}".format(self.core.get_attribute(lec_node, "name"),self.core.get_attribute(lec_node, "model")))
+            logger.info("LEC info: {0} {1}".format(self.core.get_attribute(lec_node, "name"),
+                                                   self.core.get_attribute(lec_node, "model")))
             lec_hash = self.core.get_attribute(lec_node, "model")
             logger.info("Hash is {0}".format(lec_hash))
             lec_file_content = self.get_file(lec_hash)
+
+
+            # Dataset Parsing
+            # verification_dataset_node_list = verification_setup_child_node_map.get(
+            #     NNVKeys.template_dataset_exec_node_meta, []
+            # )
+            #
+            # if len(verification_dataset_node_list) > 1:
+            #     LaunchNNV.logger.warning(
+            #         "More than one object of meta-type \"{0}\" found in  meta-type object.  "
+            #         "Using the first one.".format(
+            #             NNVKeys.template_dataset_exec_node_meta
+            #         )
+            #     )
+            # elif len(verification_dataset_node_list)==0:
+            #     LaunchNNV.logger.warning(
+            #         "Need atleast one object of the type : {0}".format(
+            #             NNVKeys.template_dataset_exec_node_meta
+            #         )
+            #     )
+            # verification_dataset_node = verification_dataset_node_list[0]
+            # dataset_node_path = self.core.get_pointer_path(verification_dataset_node, NNVKeys.template_dataset_exec_node_pointer)
+            # dataset_node = self.core.load_by_path(self.root_node, dataset_node_path)
+            # dataset_node_type = self.core.get_fully_qualified_name(self.core.get_meta_type(dataset_node))
+            # logger.info("Dataset Node Type {0}".format(dataset_node_type))
+            # logger.info("Dataset info: {0} {1}".format(self.core.get_attribute(dataset_node, "name"),\
+            #                                            self.core.get_attribute(dataset_node, "image")))
+            # dataset_hash = self.core.get_attribute(dataset_node, "image")
+            # logger.info("Image Hash is {0}".format(dataset_hash))
+            # image_file = self.get_file(dataset_hash)
+
+
+            # if image_file == None:
+            #     logger.info("no images")
+            # else:
+            #     logger.info("Image file is {0}".format(image_file))
+            #
+            # logger.info("---> Image Hash is {0}".format(dataset_hash))
+
+            # try:
+                # image_file_content = self.get_file(dataset_hash)
+            # except Exception as err:
+            #     msg = str(err)
+            #     self.create_message(self.active_node, msg, 'error')
+            #     # self.result_set_error('LaunchNNV Plugin: Error encountered.  Check result details.')
+            #     # self.result_set_success(False)
+            #     exit()
+
+
 
             # logger.info("File infor: {0}".format(lec_file_content))
             # logger.info("LEC info: {0}, {1}".format(self.core.get_attribute(lec_node,"name")), self.core.get_attribute(lec_node,"model"))
@@ -118,7 +170,6 @@ class LaunchNNV(PluginBase):
                     )
                  )
             verification_neuralnetwork_node = verification_neuralnetwork_node_list[0]
-
 
             neuralnetwork_node_path = self.core.get_pointer_path(verification_neuralnetwork_node, NNVKeys.template_NN_exec_node_pointer)
             neuralnetwork_node = self.core.load_by_path(self.root_node, neuralnetwork_node_path)
@@ -188,6 +239,12 @@ class LaunchNNV(PluginBase):
                     # self.result_set_success(False)
                     exit()
 
+            # logger.info(self.get_current_config())
+            # config_name = self.get_current_config()+"_"+str(seconds_since_epoch)
+            logger.info("Now calling the DockerJob....")
+            # DockerJob.setupJob(self.project.get_project_info(), specific_directory_path, template_parameter_file)
+
+        ## Next we pass this information to the matlab docker runner....
             # self.result_set_success(True)
         except Exception as err:
                 msg = str(err)
