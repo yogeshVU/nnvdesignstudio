@@ -149,7 +149,6 @@ template_parameter_file_name = "template_parameters.json"
 output_directory_name = "/home/ubuntu/yogesh/nnv_data/inputs/"
 upload_artifact_directory = "/home/ubuntu/yogesh/nnv_data/"
 
-lec_model_file_name = "input_model.mat"
 valid_meta_type_name_set = {
     "ExperimentIndex",
 }

@@ -48,6 +48,8 @@ class LaunchNNV(PluginBase):
     def main(self):
         try:
             template_parameter_map = {}
+            image_file = None
+            lec_file_name = None
 
             #
             # TEMPLATE PARAMETERS:  GET PROJECT NAME AND OWNER
@@ -59,8 +61,6 @@ class LaunchNNV(PluginBase):
 
             template_parameter_map[NNVKeys.template_project_name_key] = project_name
             template_parameter_map[NNVKeys.template_owner_name_key] = project_owner
-
-
 
             #
             # VERIFICATION_SETUP NODE SHOULD BE ACTIVE NODE
@@ -76,7 +76,6 @@ class LaunchNNV(PluginBase):
             verification_model_node_list = verification_setup_child_node_map.get(
                 NNVKeys.template_lec_exec_node_meta, []
             )
-
 
             if len(verification_model_node_list) == 0:
                 raise RuntimeError(
@@ -94,9 +93,6 @@ class LaunchNNV(PluginBase):
                     )
                 )
 
-
-
-
             verification_model_node = verification_model_node_list[0]
             lec_node_path = self.core.get_pointer_path(verification_model_node, NNVKeys.template_lec_exec_node_pointer)
             lec_node = self.core.load_by_path(self.root_node, lec_node_path)
@@ -107,7 +103,8 @@ class LaunchNNV(PluginBase):
             # lec_hash = self.core.get_attribute(lec_node, "model")
             # logger.info("Hash is {0}".format(lec_hash))
             # lec_file_content = self.get_file(lec_hash)
-            lec_file_name = self.core.get_attribute(lec_node,"name")
+            lec_file_name = self.core.get_attribute(lec_node, "name")
+            template_parameter_map[NNVKeys.template_lec_node_meta] = lec_file_name
 
 
             # Dataset Parsing
@@ -122,23 +119,20 @@ class LaunchNNV(PluginBase):
                         NNVKeys.template_dataset_exec_node_meta
                     )
                 )
-            elif len(verification_dataset_node_list)==0:
-                LaunchNNV.logger.warning(
-                    "Need atleast one object of the type : {0}".format(
-                        NNVKeys.template_dataset_exec_node_meta
-                    )
-                )
-            verification_dataset_node = verification_dataset_node_list[0]
-            dataset_node_path = self.core.get_pointer_path(verification_dataset_node, NNVKeys.template_dataset_exec_node_pointer)
-            dataset_node = self.core.load_by_path(self.root_node, dataset_node_path)
-            dataset_node_type = self.core.get_fully_qualified_name(self.core.get_meta_type(dataset_node))
-            logger.info("Dataset Node Type {0}".format(dataset_node_type))
-            logger.info("Dataset info: {0} {1}".format(self.core.get_attribute(dataset_node, "name"),\
-                                                       self.core.get_attribute(dataset_node, "image")))
-            image_file = self.core.get_attribute(dataset_node, "name")
+            else:
+                verification_dataset_node = verification_dataset_node_list[0]
+                dataset_node_path = self.core.get_pointer_path(verification_dataset_node,
+                                                               NNVKeys.template_dataset_exec_node_pointer)
+                dataset_node = self.core.load_by_path(self.root_node, dataset_node_path)
+                dataset_node_type = self.core.get_fully_qualified_name(self.core.get_meta_type(dataset_node))
+                logger.info("Dataset Node Type {0}".format(dataset_node_type))
+                logger.info("Dataset info: {0} {1}".format(self.core.get_attribute(dataset_node, "name"), \
+                                                           self.core.get_attribute(dataset_node, "image")))
+                image_file = self.core.get_attribute(dataset_node, "name")
+
+                template_parameter_map['image'] = image_file
             # logger.info("Image Hash is {0}".format(dataset_hash))
             # image_file = self.get_file(dataset_hash)
-
 
             # if image_file == None:
             #     logger.info("no images")
@@ -148,15 +142,13 @@ class LaunchNNV(PluginBase):
             # logger.info("---> Image Hash is {0}".format(dataset_hash))
 
             # try:
-                # image_file_content = self.get_file(dataset_hash)
+            # image_file_content = self.get_file(dataset_hash)
             # except Exception as err:
             #     msg = str(err)
             #     self.create_message(self.active_node, msg, 'error')
             #     # self.result_set_error('LaunchNNV Plugin: Error encountered.  Check result details.')
             #     # self.result_set_success(False)
             #     exit()
-
-
 
             # logger.info("File infor: {0}".format(lec_file_content))
             # logger.info("LEC info: {0}, {1}".format(self.core.get_attribute(lec_node,"name")), self.core.get_attribute(lec_node,"model"))
@@ -171,13 +163,14 @@ class LaunchNNV(PluginBase):
                         NNVKeys.template_NN_exec_node_meta
 
                     )
-                 )
+                )
             verification_neuralnetwork_node = verification_neuralnetwork_node_list[0]
 
-            neuralnetwork_node_path = self.core.get_pointer_path(verification_neuralnetwork_node, NNVKeys.template_NN_exec_node_pointer)
+            neuralnetwork_node_path = self.core.get_pointer_path(verification_neuralnetwork_node,
+                                                                 NNVKeys.template_NN_exec_node_pointer)
             neuralnetwork_node = self.core.load_by_path(self.root_node, neuralnetwork_node_path)
 
-            logger.info("lec_path {0} and neural_network_path {1}".format(lec_node_path,neuralnetwork_node_path))
+            logger.info("lec_path {0} and neural_network_path {1}".format(lec_node_path, neuralnetwork_node_path))
             neuralnetwork_type = self.core.get_fully_qualified_name(self.core.get_meta_type(neuralnetwork_node))
             logger.info("Neural Network Type {0}".format(neuralnetwork_type))
 
@@ -203,49 +196,49 @@ class LaunchNNV(PluginBase):
                 specific_directory_path, lec_file_name
             )
 
-            image_file_output_path = Path(
-                specific_directory_path, image_file
-            )
-            import shutil
-            image_input_path = Path(NNVKeys.upload_artifact_directory, project_owner,project_name,image_file)
+            if image_file is not None:
+                image_file_output_path = Path(
+                    specific_directory_path, image_file
+                )
+                import shutil
+                image_input_path = Path(NNVKeys.upload_artifact_directory, project_owner, project_name, image_file)
 
-            try:
-                shutil.copy2(str(image_input_path),str(image_file_output_path))  # complete target filename given
-            except Exception as err1:
-                msg = str(err1)
-                LaunchNNV.logger.info('exception ' + msg)
-                traceback_msg = traceback.format_exc()
-                LaunchNNV.logger.info(traceback_msg)
-                sys_exec_info_msg = sys.exc_info()[2]
-                LaunchNNV.logger.info(sys_exec_info_msg)
-                self.create_message(self.active_node, msg, 'error')
-                self.create_message(self.active_node, traceback_msg, 'error')
-                self.create_message(self.active_node, sys_exec_info_msg, 'error')
-                # self.result_set_error('LaunchNNV Plugin: Error encountered.  Check result details.')
-                # self.result_set_success(False)
-                exit()
+                try:
+                    shutil.copy2(str(image_input_path), str(image_file_output_path))  # complete target filename given
+                except Exception as err1:
+                    msg = str(err1)
+                    LaunchNNV.logger.info('exception ' + msg)
+                    traceback_msg = traceback.format_exc()
+                    LaunchNNV.logger.info(traceback_msg)
+                    sys_exec_info_msg = sys.exc_info()[2]
+                    LaunchNNV.logger.info(sys_exec_info_msg)
+                    self.create_message(self.active_node, msg, 'error')
+                    self.create_message(self.active_node, traceback_msg, 'error')
+                    self.create_message(self.active_node, sys_exec_info_msg, 'error')
+                    # self.result_set_error('LaunchNNV Plugin: Error encountered.  Check result details.')
+                    # self.result_set_success(False)
+                    exit()
 
+            if lec_file_name is not None:
+                import shutil
+                lec_model_input_path = Path(NNVKeys.upload_artifact_directory, project_owner, project_name, lec_file_name)
+                logger.info("LEC_FILE_PATH:{0} , LEC_OUTPUT_PATH: {1}".format(lec_model_input_path, lec_model_file_path))
 
-
-            import shutil
-            lec_model_input_path = Path(NNVKeys.upload_artifact_directory, project_owner,project_name,lec_file_name)
-            logger.info("LEC_FILE_PATH:{0} , LEC_OUTPUT_PATH: {1}".format(lec_model_input_path,lec_model_file_path))
-
-            try:
-                shutil.copy2(str(lec_model_input_path),str(lec_model_file_path))  # complete target filename given
-            except Exception as err1:
-                msg = str(err1)
-                LaunchNNV.logger.info('exception ' + msg)
-                traceback_msg = traceback.format_exc()
-                LaunchNNV.logger.info(traceback_msg)
-                sys_exec_info_msg = sys.exc_info()[2]
-                LaunchNNV.logger.info(sys_exec_info_msg)
-                self.create_message(self.active_node, msg, 'error')
-                self.create_message(self.active_node, traceback_msg, 'error')
-                self.create_message(self.active_node, sys_exec_info_msg, 'error')
-                # self.result_set_error('LaunchNNV Plugin: Error encountered.  Check result details.')
-                # self.result_set_success(False)
-                exit()
+                try:
+                    shutil.copy2(str(lec_model_input_path), str(lec_model_file_path))  # complete target filename given
+                except Exception as err1:
+                    msg = str(err1)
+                    LaunchNNV.logger.info('exception ' + msg)
+                    traceback_msg = traceback.format_exc()
+                    LaunchNNV.logger.info(traceback_msg)
+                    sys_exec_info_msg = sys.exc_info()[2]
+                    LaunchNNV.logger.info(sys_exec_info_msg)
+                    self.create_message(self.active_node, msg, 'error')
+                    self.create_message(self.active_node, traceback_msg, 'error')
+                    self.create_message(self.active_node, sys_exec_info_msg, 'error')
+                    # self.result_set_error('LaunchNNV Plugin: Error encountered.  Check result details.')
+                    # self.result_set_success(False)
+                    exit()
 
             # with lec_model_file.open("w") as lec_model_file_fp:
             #     try:
@@ -263,7 +256,6 @@ class LaunchNNV(PluginBase):
             #         # self.result_set_error('LaunchNNV Plugin: Error encountered.  Check result details.')
             #         # self.result_set_success(False)
             #         exit()
-
 
             with template_parameter_file.open("w", encoding="utf-8") as template_parameter_file_fp:
                 try:
@@ -292,13 +284,13 @@ class LaunchNNV(PluginBase):
             # DockerJob.setupJob(self.project.get_project_info(), specific_directory_path, template_parameter_file)
 
         ## Next we pass this information to the matlab docker runner....
-            # self.result_set_success(True)
+        # self.result_set_success(True)
         except Exception as err:
-                msg = str(err)
-                self.create_message(self.active_node, msg, 'error')
-                # self.result_set_error('LaunchNNV Plugin: Error encountered.  Check result details.')
-                # self.result_set_success(False)
-                exit()
+            msg = str(err)
+            self.create_message(self.active_node, msg, 'error')
+            # self.result_set_error('LaunchNNV Plugin: Error encountered.  Check result details.')
+            # self.result_set_success(False)
+            exit()
 
     def check_active_node_meta(self):
         return self.active_node_meta_type_name in NNVKeys.valid_meta_type_name_set
