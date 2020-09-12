@@ -45,22 +45,6 @@ class LaunchNNV(PluginBase):
         self.active_node_meta_type = None
         self.active_node_meta_type_name = None
 
-    ## If there is a file download it:
-    def save_file(self):
-        cc = self.get_current_config()
-        logger.info("{0}".format(cc))
-        has = "97f110b197ae7ade9da41a9a4c430a960e6dbd6c"
-        result = self.get_file(has)
-        logger.info(result)
-        # file_content = self.get_artifact(cc['testimage'])
-        # logger.info("file_content")
-        # with open(self._temp_file_name(), 'w') as f:
-        #     f.write(file_content)
-
-    @staticmethod
-    def _temp_file_name():
-        return __file__.replace('__init__.py', 'uploaded/test.conf')
-
     def main(self):
         try:
             template_parameter_map = {}
@@ -71,13 +55,12 @@ class LaunchNNV(PluginBase):
             project_info = self.project.get_project_info()
             logger.info(NNVKeys.template_project_name_key)
             project_name = project_info.get(NNVKeys.template_project_name_key)
-            project_owner = project_info.get(NNVKeys.template_project_name_key)
+            project_owner = project_info.get(NNVKeys.template_owner_name_key)
 
             template_parameter_map[NNVKeys.template_project_name_key] = project_name
             template_parameter_map[NNVKeys.template_owner_name_key] = project_owner
 
 
-            self.save_file()
 
             #
             # VERIFICATION_SETUP NODE SHOULD BE ACTIVE NODE
@@ -121,37 +104,38 @@ class LaunchNNV(PluginBase):
             logger.info("LEC Node Type {0}".format(lec_node_type))
             logger.info("LEC info: {0} {1}".format(self.core.get_attribute(lec_node, "name"),
                                                    self.core.get_attribute(lec_node, "model")))
-            lec_hash = self.core.get_attribute(lec_node, "model")
-            logger.info("Hash is {0}".format(lec_hash))
-            lec_file_content = self.get_file(lec_hash)
+            # lec_hash = self.core.get_attribute(lec_node, "model")
+            # logger.info("Hash is {0}".format(lec_hash))
+            # lec_file_content = self.get_file(lec_hash)
+            lec_file_name = self.core.get_attribute(lec_node,"name")
 
 
             # Dataset Parsing
-            # verification_dataset_node_list = verification_setup_child_node_map.get(
-            #     NNVKeys.template_dataset_exec_node_meta, []
-            # )
-            #
-            # if len(verification_dataset_node_list) > 1:
-            #     LaunchNNV.logger.warning(
-            #         "More than one object of meta-type \"{0}\" found in  meta-type object.  "
-            #         "Using the first one.".format(
-            #             NNVKeys.template_dataset_exec_node_meta
-            #         )
-            #     )
-            # elif len(verification_dataset_node_list)==0:
-            #     LaunchNNV.logger.warning(
-            #         "Need atleast one object of the type : {0}".format(
-            #             NNVKeys.template_dataset_exec_node_meta
-            #         )
-            #     )
-            # verification_dataset_node = verification_dataset_node_list[0]
-            # dataset_node_path = self.core.get_pointer_path(verification_dataset_node, NNVKeys.template_dataset_exec_node_pointer)
-            # dataset_node = self.core.load_by_path(self.root_node, dataset_node_path)
-            # dataset_node_type = self.core.get_fully_qualified_name(self.core.get_meta_type(dataset_node))
-            # logger.info("Dataset Node Type {0}".format(dataset_node_type))
-            # logger.info("Dataset info: {0} {1}".format(self.core.get_attribute(dataset_node, "name"),\
-            #                                            self.core.get_attribute(dataset_node, "image")))
-            # dataset_hash = self.core.get_attribute(dataset_node, "image")
+            verification_dataset_node_list = verification_setup_child_node_map.get(
+                NNVKeys.template_dataset_exec_node_meta, []
+            )
+
+            if len(verification_dataset_node_list) > 1:
+                LaunchNNV.logger.warning(
+                    "More than one object of meta-type \"{0}\" found in  meta-type object.  "
+                    "Using the first one.".format(
+                        NNVKeys.template_dataset_exec_node_meta
+                    )
+                )
+            elif len(verification_dataset_node_list)==0:
+                LaunchNNV.logger.warning(
+                    "Need atleast one object of the type : {0}".format(
+                        NNVKeys.template_dataset_exec_node_meta
+                    )
+                )
+            verification_dataset_node = verification_dataset_node_list[0]
+            dataset_node_path = self.core.get_pointer_path(verification_dataset_node, NNVKeys.template_dataset_exec_node_pointer)
+            dataset_node = self.core.load_by_path(self.root_node, dataset_node_path)
+            dataset_node_type = self.core.get_fully_qualified_name(self.core.get_meta_type(dataset_node))
+            logger.info("Dataset Node Type {0}".format(dataset_node_type))
+            logger.info("Dataset info: {0} {1}".format(self.core.get_attribute(dataset_node, "name"),\
+                                                       self.core.get_attribute(dataset_node, "image")))
+            image_file = self.core.get_attribute(dataset_node, "name")
             # logger.info("Image Hash is {0}".format(dataset_hash))
             # image_file = self.get_file(dataset_hash)
 
@@ -215,26 +199,70 @@ class LaunchNNV(PluginBase):
                 specific_directory_path, NNVKeys.template_parameter_file_name
             )
 
-            lec_model_file = Path(
-                specific_directory_path, NNVKeys.lec_model_file_name
+            lec_model_file_path = Path(
+                specific_directory_path, lec_file_name
             )
 
-            with lec_model_file.open("w") as lec_model_file_fp:
-                try:
-                    lec_model_file_fp.write(lec_file_content)
-                except Exception as err1:
-                    msg = str(err1)
-                    LaunchNNV.logger.info('exception ' + msg)
-                    traceback_msg = traceback.format_exc()
-                    LaunchNNV.logger.info(traceback_msg)
-                    sys_exec_info_msg = sys.exc_info()[2]
-                    LaunchNNV.logger.info(sys_exec_info_msg)
-                    self.create_message(self.active_node, msg, 'error')
-                    self.create_message(self.active_node, traceback_msg, 'error')
-                    self.create_message(self.active_node, sys_exec_info_msg, 'error')
-                    # self.result_set_error('LaunchNNV Plugin: Error encountered.  Check result details.')
-                    # self.result_set_success(False)
-                    exit()
+            image_file_output_path = Path(
+                specific_directory_path, image_file
+            )
+            import shutil
+            image_input_path = Path(NNVKeys.upload_artifact_directory, project_owner,project_name,image_file)
+
+            try:
+                shutil.copy2(str(image_input_path),str(image_file_output_path))  # complete target filename given
+            except Exception as err1:
+                msg = str(err1)
+                LaunchNNV.logger.info('exception ' + msg)
+                traceback_msg = traceback.format_exc()
+                LaunchNNV.logger.info(traceback_msg)
+                sys_exec_info_msg = sys.exc_info()[2]
+                LaunchNNV.logger.info(sys_exec_info_msg)
+                self.create_message(self.active_node, msg, 'error')
+                self.create_message(self.active_node, traceback_msg, 'error')
+                self.create_message(self.active_node, sys_exec_info_msg, 'error')
+                # self.result_set_error('LaunchNNV Plugin: Error encountered.  Check result details.')
+                # self.result_set_success(False)
+                exit()
+
+
+
+            import shutil
+            lec_model_input_path = Path(NNVKeys.upload_artifact_directory, project_owner,project_name,lec_file_name)
+            logger.info("LEC_FILE_PATH:{0} , LEC_OUTPUT_PATH: {1}".format(lec_model_input_path,lec_model_file_path))
+
+            try:
+                shutil.copy2(str(lec_model_input_path),str(lec_model_file_path))  # complete target filename given
+            except Exception as err1:
+                msg = str(err1)
+                LaunchNNV.logger.info('exception ' + msg)
+                traceback_msg = traceback.format_exc()
+                LaunchNNV.logger.info(traceback_msg)
+                sys_exec_info_msg = sys.exc_info()[2]
+                LaunchNNV.logger.info(sys_exec_info_msg)
+                self.create_message(self.active_node, msg, 'error')
+                self.create_message(self.active_node, traceback_msg, 'error')
+                self.create_message(self.active_node, sys_exec_info_msg, 'error')
+                # self.result_set_error('LaunchNNV Plugin: Error encountered.  Check result details.')
+                # self.result_set_success(False)
+                exit()
+
+            # with lec_model_file.open("w") as lec_model_file_fp:
+            #     try:
+            #         lec_model_file_fp.write(lec_file_content)
+            #     except Exception as err1:
+            #         msg = str(err1)
+            #         LaunchNNV.logger.info('exception ' + msg)
+            #         traceback_msg = traceback.format_exc()
+            #         LaunchNNV.logger.info(traceback_msg)
+            #         sys_exec_info_msg = sys.exc_info()[2]
+            #         LaunchNNV.logger.info(sys_exec_info_msg)
+            #         self.create_message(self.active_node, msg, 'error')
+            #         self.create_message(self.active_node, traceback_msg, 'error')
+            #         self.create_message(self.active_node, sys_exec_info_msg, 'error')
+            #         # self.result_set_error('LaunchNNV Plugin: Error encountered.  Check result details.')
+            #         # self.result_set_success(False)
+            #         exit()
 
 
             with template_parameter_file.open("w", encoding="utf-8") as template_parameter_file_fp:

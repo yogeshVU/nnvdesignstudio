@@ -12,13 +12,5 @@
   "dependencies": [],
   "writeAccessRequired": false,
   "configStructure": [
-  {
-        "name": "deploymentFiles",
-        "displayName": "Deployment artifacts",
-        "description": "Currently need only the pom.xml and any model files",
-        "value": "",
-        "valueType": "asset",
-        "readOnly": false
-    }
   ]
 }
