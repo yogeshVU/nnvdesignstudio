@@ -45,6 +45,22 @@ class LaunchNNV(PluginBase):
         self.active_node_meta_type = None
         self.active_node_meta_type_name = None
 
+    ## If there is a file download it:
+    def save_file(self):
+        cc = self.get_current_config()
+        logger.info("{0}".format(cc))
+        has = "97f110b197ae7ade9da41a9a4c430a960e6dbd6c"
+        result = self.get_file(has)
+        logger.info(result)
+        # file_content = self.get_artifact(cc['testimage'])
+        # logger.info("file_content")
+        # with open(self._temp_file_name(), 'w') as f:
+        #     f.write(file_content)
+
+    @staticmethod
+    def _temp_file_name():
+        return __file__.replace('__init__.py', 'uploaded/test.conf')
+
     def main(self):
         try:
             template_parameter_map = {}
@@ -59,6 +75,9 @@ class LaunchNNV(PluginBase):
 
             template_parameter_map[NNVKeys.template_project_name_key] = project_name
             template_parameter_map[NNVKeys.template_owner_name_key] = project_owner
+
+
+            self.save_file()
 
             #
             # VERIFICATION_SETUP NODE SHOULD BE ACTIVE NODE

@@ -11,5 +11,12 @@
   "disableBrowserSideExecution": true,
   "dependencies": [],
   "writeAccessRequired": false,
-  "configStructure": []
+  "configStructure": [{
+    "name": "deploymentfiles",
+    "displayName": "Image file to test",
+    "description": "Image file to test the CNN Robustness",
+    "value": "",
+    "valueType": "asset",
+    "readOnly": false
+    }]
 }

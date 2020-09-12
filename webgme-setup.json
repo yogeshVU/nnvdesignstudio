@@ -18,6 +18,14 @@
       "MyPythonPlugin": {
         "src": "src/plugins/MyPythonPlugin",
         "test": "test/plugins/MyPythonPlugin"
+      },
+      "LaunchNNV": {
+        "src": "src/plugins/LaunchNNV",
+        "test": "test/plugins/LaunchNNV"
+      },
+      "UploadDeploymentArtifacts": {
+        "src": "src/plugins/UploadDeploymentArtifacts",
+        "test": "test/plugins/UploadDeploymentArtifacts"
       }
     }
   },

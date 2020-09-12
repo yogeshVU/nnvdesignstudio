@@ -150,5 +150,4 @@ output_directory_name = "/home/ubuntu/yogesh/outputs/"
 lec_model_file_name = "input_model.mat"
 valid_meta_type_name_set = {
     "ExperimentIndex",
-
 }
