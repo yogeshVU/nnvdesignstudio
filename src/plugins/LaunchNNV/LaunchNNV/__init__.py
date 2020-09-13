@@ -104,7 +104,7 @@ class LaunchNNV(PluginBase):
             # logger.info("Hash is {0}".format(lec_hash))
             # lec_file_content = self.get_file(lec_hash)
             lec_file_name = self.core.get_attribute(lec_node, "name")
-            template_parameter_map[NNVKeys.template_lec_node_meta] = lec_file_name
+            template_parameter_map[NNVKeys.template_lec_file_name_key] = lec_file_name
 
 
             # Dataset Parsing
@@ -281,7 +281,7 @@ class LaunchNNV(PluginBase):
             # logger.info(self.get_current_config())
             # config_name = self.get_current_config()+"_"+str(seconds_since_epoch)
             logger.info("Now calling the DockerJob....")
-            # DockerJob.setupJob(self.project.get_project_info(), specific_directory_path, template_parameter_file)
+            DockerJob.setupJob(self.project.get_project_info(), specific_directory_path, template_parameter_file)
 
         ## Next we pass this information to the matlab docker runner....
         # self.result_set_success(True)

@@ -8,7 +8,7 @@ template_lec_node_model_blob ="model"
 
 template_lec_exec_node_meta = "LECExec"
 template_lec_exec_node_pointer = "LEC"
-template_lec_file_name_key = "LEC_file_name"
+template_lec_file_name_key = "nnfile"
 
 
 template_NN_exec_node_meta = "NNModel"
