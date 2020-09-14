@@ -282,7 +282,9 @@ class LaunchNNV(PluginBase):
             # logger.info(self.get_current_config())
             # config_name = self.get_current_config()+"_"+str(seconds_since_epoch)
             logger.info("Now calling the DockerJob....")
-            DockerJob.setupJob(self.project.get_project_info(), specific_directory_path, template_parameter_file)
+            run_result = DockerJob.setupJob(self.project.get_project_info(), specific_directory_path, template_parameter_file)
+            logger.info(run_result)
+            self.add_file('log.txt',run_result)
 
         ## Next we pass this information to the matlab docker runner....
         # self.result_set_success(True)
