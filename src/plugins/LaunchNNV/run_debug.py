@@ -30,10 +30,18 @@ BRANCH_NAME = 'master'
 # ACTIVE_NODE_PATH ='/i/j/s'
 
 ## This is the DLinearNNCS
-ACTIVE_NODE_PATH ='/i/j/z'
+# ACTIVE_NODE_PATH ='/i/j/z'
 
 ### This is the DNonLinearNNCs
 # ACTIVE_NODE_PATH = '/i/j/A'
+
+# This is the Cont.Linear.NNCS
+# ACTIVE_NODE_PATH='/i/j/6'
+
+# This is the Cont.NonLinear.NNCS
+ACTIVE_NODE_PATH ='/i/j/y'
+
+
 
 ACTIVE_SELECTION_PATHS = []
 NAMESPACE = ''
