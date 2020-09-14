@@ -31,6 +31,10 @@ BRANCH_NAME = 'master'
 
 ## This is the DLinearNNCS
 ACTIVE_NODE_PATH ='/i/j/z'
+
+### This is the DNonLinearNNCs
+# ACTIVE_NODE_PATH = '/i/j/A'
+
 ACTIVE_SELECTION_PATHS = []
 NAMESPACE = ''
 METADATA_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'metadata.json')
