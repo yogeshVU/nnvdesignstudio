@@ -23,7 +23,14 @@ logger = logging.getLogger('LaunchNNV')
 PORT = '5555'
 PROJECT_NAME = 'nnvdesign_1'
 BRANCH_NAME = 'master'
-ACTIVE_NODE_PATH = '/i/j/P'
+## This is the CNN Experiment
+# ACTIVE_NODE_PATH = '/i/j/P'
+
+## This is the FFNN Experiment
+# ACTIVE_NODE_PATH ='/i/j/s'
+
+## This is the DLinearNNCS
+ACTIVE_NODE_PATH ='/i/j/z'
 ACTIVE_SELECTION_PATHS = []
 NAMESPACE = ''
 METADATA_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'metadata.json')

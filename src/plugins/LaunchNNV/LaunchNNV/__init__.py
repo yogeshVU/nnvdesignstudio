@@ -112,14 +112,15 @@ class LaunchNNV(PluginBase):
                 NNVKeys.template_dataset_exec_node_meta, []
             )
 
-            if len(verification_dataset_node_list) > 1:
-                LaunchNNV.logger.warning(
-                    "More than one object of meta-type \"{0}\" found in  meta-type object.  "
-                    "Using the first one.".format(
-                        NNVKeys.template_dataset_exec_node_meta
-                    )
-                )
-            else:
+            # if len(verification_dataset_node_list)  1:
+            #     LaunchNNV.logger.warning(
+            #         "More than one object of meta-type \"{0}\" found in  meta-type object.  "
+            #         "Using the first one.".format(
+            #             NNVKeys.template_dataset_exec_node_meta
+            #         )
+            #     )
+            # else:
+            if len(verification_dataset_node_list)>0:
                 verification_dataset_node = verification_dataset_node_list[0]
                 dataset_node_path = self.core.get_pointer_path(verification_dataset_node,
                                                                NNVKeys.template_dataset_exec_node_pointer)

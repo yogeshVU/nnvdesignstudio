@@ -8,9 +8,6 @@ def setupJob(projectInfo, folder_path, param_filename):
     return runJob(runtime='docker',folder_path=folder_path,job_params=param_filename)
 
 def runJob(runtime,folder_path,job_params):
-    # logger.info("Run Job....")
-    print("Run Job...")
-    print(runtime,folder_path,job_params)
     try:
         import subprocess
         venv_python = '/home/ubuntu/yogesh/python-tut/venv/bin/python'
@@ -20,14 +17,18 @@ def runJob(runtime,folder_path,job_params):
         while True:
             output = process.stdout.readline()
             print(output.strip())
+            # logger.info(output.strip())
             # Do something else
             return_code = process.poll()
             if return_code is not None:
-                print('RETURN CODE', return_code)
+                # logger.info('RETURN CODE: {0}'.format( return_code))
+                print('Return Code :',return_code)
                 # Process has finished, read rest of the output
                 for output in process.stdout.readlines():
+                    # logger.info(output.strip())
                     print(output.strip())
                 break
+
     except Exception as esp:
         print(esp)
     return

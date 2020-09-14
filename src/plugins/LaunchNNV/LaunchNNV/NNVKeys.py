@@ -59,6 +59,8 @@ template_FFNN_ub_key  = "ub"
 template_FFNN_reachability_key = "reach"
 template_FFNN_verification_key  = "verify"
 template_FFNN_reachability_method_key = "reach-method"
+template_FFNN_cores_key = "cores"
+template_FFNN_simCount_key = "simCount"
 
 template_FFNN_param_keys = {
     template_FFNN_halfspace_matrix_key ,
@@ -67,7 +69,10 @@ template_FFNN_param_keys = {
     template_FFNN_ub_key  ,
     template_FFNN_reachability_key ,
     template_FFNN_verification_key ,
-    template_FFNN_reachability_method_key
+    template_FFNN_reachability_method_key,
+template_FFNN_cores_key,
+template_FFNN_simCount_key
+
 }
 
 template_NNCS_halfspace_matrix_key = "HalfSpace-matrix"
