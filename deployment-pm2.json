@@ -1,0 +1,9 @@
+{
+    "apps": [
+        {
+            "name": "nnv-designstudio",
+            "script": "NODE_ENV=deployment npm",
+            "args": "start"
+        }
+    ]
+}

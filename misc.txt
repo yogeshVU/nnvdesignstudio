@@ -1,0 +1,8 @@
+
+pm2 start npm -- run startcpsvo
+pm2 logs npm
+pm2 delete npm
+pm2 status npm
+
+
+pm2 start deployment-pm2.json
