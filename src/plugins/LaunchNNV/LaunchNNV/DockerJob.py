@@ -20,7 +20,7 @@ def runDockerJob(runtime,folder_path:str,job_params:str):
 
     output_log = ""
     try:
-        NNV_Docker = 'pynnv:0.1.0'
+        NNV_Docker = 'pynnv_base:0.1.1'
         MATLAB_PATH = '/usr/local/MATLAB/R2020a/'
 
         client = docker.from_env()

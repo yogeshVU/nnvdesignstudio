@@ -8,5 +8,14 @@ var config = require('./config.webgme'),
 // config.mongo.uri = 'mongodb://127.0.0.1:27017/webgme_my_app';
 config.plugin.allowServerExecution = true;
 
+
+// Seeds
+config.seedProjects.enable = true;
+config.seedProjects.basePaths = ["./seeds"]
+
+// Icons
+// config.visualization.svgDirs = ['./icons/svg'];
+config.visualization.svgDirs.push("./icons/svg");
+
 validateConfig(config);
 module.exports = config;
