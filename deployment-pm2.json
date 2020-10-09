@@ -2,8 +2,8 @@
     "apps": [
         {
             "name": "nnv-designstudio",
-            "script": "NODE_ENV=deployment npm",
-            "args": "start"
+            "script": "npm start -- startcpsvo"
+
         }
     ]
 }
