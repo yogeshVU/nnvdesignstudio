@@ -22,7 +22,13 @@ config.authentication.allowUserRegistration = false;
 config.authentication.jwt.privateKey = __dirname + '/../../token_keys/private_key';
 config.authentication.jwt.publicKey = __dirname + '/../../token_keys/public_key';
 
+// The password defined here will be visible so make sure to change it once the server has
+// been run at least once.
+config.authentication.adminAccount = 'admin:password';
 
+//Login and logout URLs should point to the CPS_VO_GROUP
+config.authentication.logInUrl = 'http://cps-vo.org/group/AA-VO'
+config.authentication.logOutUrl = 'http://cps-vo.org/group/AA-VO'
 
 // -------------------------------------
 config.plugin.allowServerExecution = true;

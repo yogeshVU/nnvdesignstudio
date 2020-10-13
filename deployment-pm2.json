@@ -2,7 +2,7 @@
     "apps": [
         {
             "name": "nnv-designstudio",
-            "script": "npm start -- startcpsvo"
+            "script": "npm run -- startcpsvo"
 
         }
     ]
