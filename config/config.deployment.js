@@ -31,6 +31,9 @@ config.authentication.logInUrl = 'http://cps-vo.org/group/AA-VO'
 config.authentication.logOutUrl = 'http://cps-vo.org/group/AA-VO'
 
 // -------------------------------------
+
+config.authentication.publicOrganizations = ['nnv-public'];
+
 config.plugin.allowServerExecution = true;
 
 // Seeds
