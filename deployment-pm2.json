@@ -2,7 +2,7 @@
     "apps": [
         {
             "name": "nnv-designstudio",
-            "script": "npm run -- startcpsvo"
+            "script": "source venv/bin/activate && npm run -- startcpsvo"
 
         }
     ]
