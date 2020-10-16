@@ -260,11 +260,11 @@ class LaunchNNV(PluginBase):
 
             with template_parameter_file.open("w", encoding="utf-8") as template_parameter_file_fp:
                 try:
-                    my_json_str = json.dump(template_parameter_map, template_parameter_file_fp, indent=4,
+                    json.dump(template_parameter_map, template_parameter_file_fp, indent=4,
                                              sort_keys=True, ensure_ascii=False)
                     # if isinstance(my_json_str, str):
                     #     my_json_str = my_json_str.decode("utf-8")
-                    template_parameter_file_fp.write(my_json_str)
+                    # template_parameter_file_fp.write(my_json_str)
                 except Exception as err1:
                     msg = str(err1)
                     LaunchNNV.logger.info('exception ' + msg)
