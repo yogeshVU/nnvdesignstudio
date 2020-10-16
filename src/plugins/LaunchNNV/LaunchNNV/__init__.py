@@ -260,7 +260,7 @@ class LaunchNNV(PluginBase):
 
             with template_parameter_file.open("w", encoding="utf-8") as template_parameter_file_fp:
                 try:
-                    my_json_str = json.dumps(template_parameter_map, template_parameter_file_fp, indent=4,
+                    my_json_str = json.dump(template_parameter_map, template_parameter_file_fp, indent=4,
                                              sort_keys=True, ensure_ascii=False)
                     # if isinstance(my_json_str, str):
                     #     my_json_str = my_json_str.decode("utf-8")
