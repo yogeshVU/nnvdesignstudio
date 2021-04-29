@@ -87,6 +87,11 @@ template_NNCS_ub_refinput_key= "ub-refInput"
 template_NNCS_verification_key = "verify"
 template_NNCS_reach_method_key = "reach-method"
 
+template_NNCS_plotmethod_key = 'plotmethod'
+template_NNCS_plot_xdim_key = 'plot_xdim'
+template_NNCS_plot_ydim_key = 'plot_ydim'
+template_NNCS_plot_zdim_key = 'plot_zdim'
+
 
 template_NNCS_param_keys = {
     template_NNCS_halfspace_matrix_key,
@@ -99,7 +104,13 @@ template_NNCS_param_keys = {
     template_NNCS_lb_refinput_key ,
     template_NNCS_ub_refinput_key,
     template_NNCS_verification_key,
-    template_NNCS_reach_method_key
+    template_NNCS_reach_method_key,
+
+    template_NNCS_plotmethod_key,
+    template_NNCS_plot_xdim_key,
+    template_NNCS_plot_ydim_key,
+    template_NNCS_plot_zdim_key
+
 }
 
 template_NNCS_LinearSys_A_key = "A"
@@ -162,8 +173,10 @@ template_NN_param[template_NN_NNCS_DiscreteNonLinear_key] = template_NNCS_NonLin
 
 
 template_parameter_file_name = "template_parameters.json"
-output_directory_name = "/home/ubuntu/nnv_data/inputs/"
-upload_artifact_directory = "/home/ubuntu/nnv_data/"
+# output_directory_name = "/home/ubuntu/nnv_data/inputs/"
+
+output_directory_name = "/home/ubuntu/yogesh/nnv_data/inputs/"
+upload_artifact_directory = "/home/ubuntu/yogesh/nnv_data/"
 
 valid_meta_type_name_set = {
     "ExperimentIndex",

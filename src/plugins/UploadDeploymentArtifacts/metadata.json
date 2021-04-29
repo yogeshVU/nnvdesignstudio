@@ -15,7 +15,7 @@
   {
         "name": "deploymentFiles",
         "displayName": "Deployment artifacts",
-        "description": "Currently need only the pom.xml and any model files",
+        "description": "Upload model files inside a zip archive only!!!",
         "value": "",
         "valueType": "asset",
         "readOnly": false

@@ -68,10 +68,12 @@ define([
 
         // Using the coreAPI to make changes.
         const nodeObject = self.activeNode;
+        // self.logger.info("name: ",self.core.get_fully_qualified_name(self.core.get_meta_type(self.activeNode)))
         self.userDir = ""
         self.projectDir = self.project.projectName
         self.projectPath = ""
         self.runDir = ""
+        self.modelname = self.core.getAttribute(self.activeNode,"name")
 
         // self.workingDir = "/home/ubuntu/blobdir"
         self.workingDir = "/home/ubuntu/file-server"
@@ -87,7 +89,8 @@ define([
         if (typeof WebGMEGlobal !== 'undefined') {
             console.log("testing")
 
-            self.workingDir = WebGMEGlobal.componentSettings['folder'];
+            self.workingDir = WebGMEGlobal.componentSettings["UserDir"].folder;
+
             console.log("self.workingDir::", self.workingDir)
         }
 
@@ -248,7 +251,7 @@ define([
             path = require('path');
         console.log("objBuffer:", objBuffer)
         console.log("runDir:", self.runDir)
-        console.log("runDir:", self.runDir)
+        // console.log("runDir:", self.runDir)
         const zlib = require('zlib');
 
         self.zipBuffer = new Buffer(objBuffer);
@@ -264,7 +267,7 @@ define([
         bufferStream.end(self.zipBuffer);
         bufferStream
             .pipe(unzip.Parse())
-            .pipe(writeStream);
+             .pipe(writeStream);
         return deferred.promise;
         // return deferred.promise;
     }
@@ -285,9 +288,11 @@ define([
         self.userDir = path.normalize(path.join(self.workingDir, userInfo))
         self.projectDir = self.project.projectName
         self.projectPath = path.join(self.userDir, self.projectDir)
+        self.modelPath = path.join(self.projectPath,self.modelname)
 
         // var tmppath =path.join( self.workingDir, hashes[0])
-        self.runDir = path.normalize(self.projectPath);
+        // self.runDir = path.normalize(self.projectPath);
+        self.runDir = path.normalize(self.modelPath);
         console.log(self.runDir)
         // console.log(runDir)
         if (!fs.existsSync(self.userDir)) {

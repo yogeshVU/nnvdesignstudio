@@ -7,6 +7,8 @@ def setupJob(projectInfo, folder_path, param_filename) -> str:
     # logger.info("param_filename: {0} ".format(param_filename))
     # logger.info("projectInfo {0}".format(projectInfo))
     print("Setup Job")
+    print("Folder Path= ",folder_path)
+    print("job_params=",param_filename)
     # return runJob(runtime='docker',folder_path=folder_path,job_params=param_filename)
     return runDockerJob(runtime='docker',folder_path=folder_path,job_params=param_filename)
 

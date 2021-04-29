@@ -21,7 +21,10 @@ logger = logging.getLogger('LaunchNNV')
 
 # Modify these or add option or parse from sys.argv (as in done in run_plugin.py)
 PORT = '5555'
-PROJECT_NAME = 'nnvdesign_1'
+# PROJECT_NAME = 'nnvdesign_1'
+
+PROJECT_NAME = 'nnvplot1'
+
 BRANCH_NAME = 'master'
 ## This is the CNN Experiment
 # ACTIVE_NODE_PATH = '/i/j/P'
@@ -36,10 +39,13 @@ BRANCH_NAME = 'master'
 # ACTIVE_NODE_PATH = '/i/j/A'
 
 # This is the Cont.Linear.NNCS
-# ACTIVE_NODE_PATH='/i/j/6'
+ACTIVE_NODE_PATH='/i/j/6'
 
 # This is the Cont.NonLinear.NNCS
-ACTIVE_NODE_PATH ='/i/j/y'
+# ACTIVE_NODE_PATH ='/i/j/y'
+
+#Cont.Linear.nncs
+# ACTIVE_NODE_PATH ='/i/j/6'
 
 
 

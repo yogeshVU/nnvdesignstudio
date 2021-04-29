@@ -3,6 +3,7 @@ This is where the implementation of the plugin code goes.
 The LaunchNNV-class is imported from both run_plugin.py and run_debug.py
 """
 import json
+import os
 import sys
 import logging
 import time
@@ -106,6 +107,8 @@ class LaunchNNV(PluginBase):
             lec_file_name = self.core.get_attribute(lec_node, "name")
             template_parameter_map[NNVKeys.template_lec_file_name_key] = lec_file_name
 
+            modelpath = self.core.get_attribute(self.core.get_parent(lec_node),'name')
+
 
             # Dataset Parsing
             verification_dataset_node_list = verification_setup_child_node_map.get(
@@ -202,7 +205,7 @@ class LaunchNNV(PluginBase):
                     specific_directory_path, image_file
                 )
                 import shutil
-                image_input_path = Path(NNVKeys.upload_artifact_directory, project_owner, project_name, image_file)
+                image_input_path = Path(NNVKeys.upload_artifact_directory, project_owner, project_name,modelpath, image_file)
 
                 try:
                     shutil.copy2(str(image_input_path), str(image_file_output_path))  # complete target filename given
@@ -222,7 +225,7 @@ class LaunchNNV(PluginBase):
 
             if lec_file_name is not None:
                 import shutil
-                lec_model_input_path = Path(NNVKeys.upload_artifact_directory, project_owner, project_name, lec_file_name)
+                lec_model_input_path = Path(NNVKeys.upload_artifact_directory, project_owner, project_name,modelpath, lec_file_name)
                 logger.info("LEC_FILE_PATH:{0} , LEC_OUTPUT_PATH: {1}".format(lec_model_input_path, lec_model_file_path))
 
                 try:
@@ -284,8 +287,47 @@ class LaunchNNV(PluginBase):
             logger.info("Now calling the DockerJob....")
             run_result = DockerJob.setupJob(self.project.get_project_info(), specific_directory_path, template_parameter_file)
             logger.info(run_result)
+            # self.add_file('log.txt', str(run_result))
+            # self.add_file('log2.txt', str(run_result))
+
+            # hash = self.add_artifact('ResultArtifact', {'log.txt': str(run_result)})
+
+            import zipfile
+            z = zipfile.ZipFile(str(specific_directory_path)+ '/result.zip', "w")
+
+            import glob
+            svg_files = str(specific_directory_path) + "/*.svg"
+            print(svg_files)
+            try:
+                for filename in glob.glob(svg_files):
+                    base = os.path.basename(filename)
+                    print(base)
+                    binary_file =  open(filename, 'r')
+                    binary_content = binary_file.read()
+                    bin_hash = self.add_file(str(filename), binary_content)
+                    z.write(filename,arcname=base)
+
+                    # Write to  the zip file....
+                z.close()
+                binary_file = open(str(specific_directory_path)+ '/result.zip', 'r')
+                binary_content = binary_file.read()
+                bin_hash = self.add_file(str(specific_directory_path)+ '/result.zip', binary_content)
+                # hash_zip = self.add_artifact('ResultArtifact', {str(specific_directory_path)+ '/result.zip': binary_content})
+                # binary_file = open(str(specific_directory_path)+ '/template_parameters.json', 'r')
+                # binary_content = binary_file.read()
+                # bin_hash = self.add_file(str(specific_directory_path)+ '/template_parameters.json', binary_content)
+            except Exception as err:
+                print(err)
+
+            # retrieved_content = self.get_bin_file(hash_zip)
+            # if hash_zip !=retrieved_content:
+            #     print("mismatch...")
+            # else:
+            #     print("They match....")
+
             self.add_file('log.txt', str(run_result))
 
+            #
         ## Next we pass this information to the matlab docker runner....
         # self.result_set_success(True)
         except Exception as err:
